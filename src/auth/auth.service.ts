@@ -45,7 +45,6 @@ export class AuthService {
     if (existedUser) {
       throw new ConflictException(this.i18n.t('auth.userAlreadyExists'));
     }
-
     const hashPassword = await bcrypt.hash(dto.password, 10);
     const user = await this.userService.create({
       username: dto.username,

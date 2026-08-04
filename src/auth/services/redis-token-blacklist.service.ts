@@ -6,14 +6,13 @@ export class RedisTokenBlacklistService {
   constructor(
     private readonly sessionTokenRepository: RedisSessionTokenRepository,
   ) {}
-  // Revoke the current token by storing its JTI in Redis with a TTL.
+  // Thu hồi token bằng cách lưu jti vào Redis với thời gian sống (TTL) tương ứng
   async invalidateToken(jti: string, expiresAt: number): Promise<void> {
     const ttl = expiresAt - Math.floor(Date.now() / 1000);
 
     if (ttl <= 0) {
       return;
     }
-
     await this.sessionTokenRepository.saveRevokedTokenId(jti, ttl);
   }
 
@@ -37,7 +36,6 @@ export class RedisTokenBlacklistService {
   // Kiểm tra xem token có bị thu hồi hay không
   async isTokenRevoked(jti: string): Promise<boolean> {
     const value = await this.sessionTokenRepository.findRevokedTokenId(jti);
-
     return value === '1';
   }
 }
