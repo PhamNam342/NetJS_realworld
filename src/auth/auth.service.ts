@@ -14,6 +14,8 @@ import { User } from '../users/entities/user.entity';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { AuthenticatedUser } from './interfaces/authenticated-user.interface';
 import { RedisTokenBlacklistService } from './services/redis-token-blacklist.service';
+import { UserResponseDto } from '../users/dto/user-response.dto';
+import { AuthResponseDto } from './dto/auth-response.dto';
 const JWT_ACCESS_TOKEN_EXPIRES_IN = '1h';
 
 type AuthUserResponse = {
@@ -52,8 +54,7 @@ export class AuthService {
       password: hashPassword,
     });
 
-    const { token, jti } = this.signToken(user);
-    await this.tokenBlacklistService.recordActiveSession(user.id, jti);
+    const { token } = this.signToken(user);
 
     return this.toAuthUserResponse(user, token);
   }
@@ -68,8 +69,7 @@ export class AuthService {
       throw new UnauthorizedException(this.i18n.t('auth.invalidCredentials'));
     }
     // ghi nhận phiên đăng nhập mới và lưu jti vào Redis
-    const { token, jti } = this.signToken(user);
-    await this.tokenBlacklistService.recordActiveSession(user.id, jti);
+    const { token } = this.signToken(user);
     return this.toAuthUserResponse(user, token);
   }
 
@@ -77,7 +77,7 @@ export class AuthService {
     // Thu hồi token hiện tại bằng cách lưu jti vào Redis với TTL.
     await Promise.all([
       this.tokenBlacklistService.invalidateToken(user.jti, user.exp),
-      this.tokenBlacklistService.delete(user.id),
+      // this.tokenBlacklistService.delete(user.id),
     ]);
     return {
       message: this.i18n.t('auth.loggedOutSuccessfully'),
@@ -102,15 +102,15 @@ export class AuthService {
   }
   // Chuyển đổi thông tin người dùng thành định dạng phản hồi AuthUserResponse
   private toAuthUserResponse(user: User, token?: string): AuthUserResponse {
-    return {
-      user: {
+    return new AuthResponseDto({
+      user: new UserResponseDto({
         id: user.id,
         username: user.username,
         email: user.email,
         bio: user.bio ?? null,
         image: user.image ?? null,
-        ...(token ? { token } : {}),
-      },
-    };
+      }),
+      token: token ?? '',
+    });
   }
 }

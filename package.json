@@ -16,7 +16,7 @@
     "sunlint": "sunlint --all --input=src",
     "sunlint:changed": "sunlint --all --changed-files",
     "sunlint:security": "sunlint --security --input=src",
-    "migration:generate": "node -r ts-node/register/transpile-only -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate src/database/migrations/CreateUsers -d src/database/data-source.ts",
+    "migration:generate": "node -r ts-node/register/transpile-only -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -d src/database/data-source.ts",
     "migration:run": "node -r ts-node/register/transpile-only -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d src/database/data-source.ts",
     "migration:revert": "node -r ts-node/register/transpile-only -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:revert -d src/database/data-source.ts",
     "test": "jest",
