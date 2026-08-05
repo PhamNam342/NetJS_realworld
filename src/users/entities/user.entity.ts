@@ -11,7 +11,9 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column()
+  @Column({
+    unique: true,
+  })
   username!: string;
 
   @Column({
@@ -26,6 +28,7 @@ export class User {
   password!: string;
 
   @Column({
+    type: 'text',
     nullable: true,
   })
   bio?: string;
@@ -35,9 +38,13 @@ export class User {
   })
   image?: string;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({
+    name: 'created_at',
+  })
   createdAt!: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn({
+    name: 'updated_at',
+  })
   updatedAt!: Date;
 }
