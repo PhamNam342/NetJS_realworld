@@ -1,4 +1,3 @@
-// sunlint-disable-next-line So41
 import { Injectable } from '@nestjs/common';
 import { RedisSessionTokenRepository } from '../repositories/redis-session-token.repository';
 
