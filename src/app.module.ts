@@ -12,6 +12,8 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { AttachmentsModule } from './attachments/attachments.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { FollowsModule } from './follows/follows.module';
+import { ArticlesModule } from './articles/articles.module';
+import { FavoritesModule } from './favorites/favorites.module';
 
 @Module({
   imports: [
@@ -64,6 +66,8 @@ import { FollowsModule } from './follows/follows.module';
       rootPath: join(__dirname, '..', 'public'),
     }),
     FollowsModule,
+    ArticlesModule,
+    FavoritesModule,
   ],
 
   controllers: [AppController],

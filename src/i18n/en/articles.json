@@ -1,0 +1,6 @@
+{
+  "userNotFound": "User not found",
+  "slugAlreadyExists": "Article slug already exists",
+  "notFound": "Article not found",
+  "notAuthor": "You are not the author"
+}
