@@ -1,4 +1,3 @@
-// sunlint-disable S041
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { createClient, RedisClientType } from 'redis';
 // Cấu hình các khóa Redis cho việc quản lý token bị thu hồi và phiên đăng nhập
