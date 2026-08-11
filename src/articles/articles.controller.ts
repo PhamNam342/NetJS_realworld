@@ -47,6 +47,7 @@ export class ArticlesController {
   }
   // GET /api/articles
   @Get()
+  @ApiBearerAuth()
   @UseGuards(OptionalJwtAuthGuard)
   @ApiQuery({
     name: 'tag',
@@ -57,6 +58,11 @@ export class ArticlesController {
     name: 'author',
     required: false,
     example: 'nam',
+  })
+  @ApiQuery({
+    name: 'favorited',
+    required: false,
+    example: 'jake',
   })
   @ApiQuery({
     name: 'limit',

@@ -18,6 +18,7 @@ import { ProfileResponseDto } from 'src/users/dto/profile-response.dto';
 import { AuthenticatedUser } from 'src/auth/interfaces/authenticated-user.interface';
 import { FollowsService } from 'src/follows/follows.service';
 import { FavoritesService } from 'src/favorites/favorites.service';
+import { Favorite } from 'src/favorites/entities/favorite.entity';
 @Injectable()
 export class ArticlesService {
   constructor(
@@ -90,6 +91,19 @@ export class ArticlesService {
     if (query.author) {
       qb.andWhere('author.username = :author', {
         author: query.author,
+      });
+    }
+    // filter có theo bài có người thích
+    if (query.favorited) {
+      qb.innerJoin(Favorite, 'favorite', 'favorite.article_id = article.id');
+      qb.innerJoin(
+        User,
+        'favoritedUser',
+        'favoritedUser.id = favorite.user_id',
+      );
+
+      qb.andWhere('favoritedUser.username = :favorited', {
+        favorited: query.favorited,
       });
     }
 
