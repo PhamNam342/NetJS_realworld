@@ -1,3 +1,4 @@
+// sunlint-disable S041
 import {
   Body,
   Controller,

@@ -1,0 +1,6 @@
+{
+    "ArticleNotFound":"Article not found",
+    "UserNotFound": "User not found",
+    "CommentNotFound":"Comment not found",
+    "YouCanOnlyDeleteYourOwnComments":"You can only delete your own comments"
+}

@@ -14,7 +14,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { FollowsModule } from './follows/follows.module';
 import { ArticlesModule } from './articles/articles.module';
 import { FavoritesModule } from './favorites/favorites.module';
-
+import { CommentsModule } from './comments/comments.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -68,6 +68,7 @@ import { FavoritesModule } from './favorites/favorites.module';
     FollowsModule,
     ArticlesModule,
     FavoritesModule,
+    CommentsModule,
   ],
 
   controllers: [AppController],
