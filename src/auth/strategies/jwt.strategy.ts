@@ -8,7 +8,6 @@ import { JwtPayload } from '../interfaces/jwt-payload.interface';
 import { AuthenticatedUser } from '../interfaces/authenticated-user.interface';
 import { RedisTokenBlacklistService } from '../services/redis-token-blacklist.service';
 import { getJwtSecret } from '../config/jwt-secret.config';
-
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(

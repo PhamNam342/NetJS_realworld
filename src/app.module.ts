@@ -8,8 +8,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
-import { ServeStaticModule } from '@nestjs/serve-static';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { AttachmentsModule } from './attachments/attachments.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { FollowsModule } from './follows/follows.module';
 
 @Module({
   imports: [
@@ -56,9 +58,12 @@ import { ThrottlerModule } from '@nestjs/throttler';
     HelloModule,
     UsersModule,
     AuthModule,
+    AttachmentsModule,
+    FollowsModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
     }),
+    FollowsModule,
   ],
 
   controllers: [AppController],
