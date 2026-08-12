@@ -57,11 +57,21 @@ export class UsersService {
         throw new NotFoundException(this.i18n.t('users.notFound'));
       }
 
-      const updateData: Partial<User> = {
-        ...dto,
-      };
+      const updateData: Partial<User> = {};
 
-      if (dto.password) {
+      if (dto.username !== undefined) {
+        updateData.username = dto.username;
+      }
+
+      if (dto.email !== undefined) {
+        updateData.email = dto.email;
+      }
+
+      if (dto.bio !== undefined) {
+        updateData.bio = dto.bio;
+      }
+
+      if (dto.password !== undefined) {
         updateData.password = await bcrypt.hash(dto.password, 10);
       }
 
@@ -93,13 +103,19 @@ export class UsersService {
 
         updateData.image = attachment.url;
       }
-      await userRepository.update(userId, updateData);
+
+      if (Object.keys(updateData).length > 0) {
+        await userRepository.update(userId, updateData);
+      }
+
       const updatedUser = await userRepository.findOne({
         where: { id: userId },
       });
+
       if (!updatedUser) {
         throw new NotFoundException(this.i18n.t('users.notFound'));
       }
+
       return updatedUser;
     });
   }
