@@ -34,4 +34,9 @@ export class Attachment {
     default: () => 'CURRENT_TIMESTAMP',
   })
   createdAt!: Date;
+  @Column({
+    type: 'timestamp',
+    nullable: true,
+  })
+  deletedAt!: Date | null;
 }

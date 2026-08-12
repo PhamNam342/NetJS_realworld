@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { Attachment } from './entities/attachment.entity';
-
 @Injectable()
 export class AttachmentsService {
   constructor(
@@ -10,8 +9,14 @@ export class AttachmentsService {
     private readonly attachmentRepository: Repository<Attachment>,
   ) {}
 
-  async create(data: Partial<Attachment>): Promise<Attachment> {
-    const attachment = this.attachmentRepository.create(data);
-    return this.attachmentRepository.save(attachment);
+  async create(
+    data: Partial<Attachment>,
+    manager?: EntityManager,
+  ): Promise<Attachment> {
+    const repository = manager
+      ? manager.getRepository(Attachment)
+      : this.attachmentRepository;
+    const attachment = repository.create(data);
+    return repository.save(attachment);
   }
 }
