@@ -10,11 +10,15 @@ import {
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { RegisterDto } from './dto/register.dto';
+
 import { LoginDto } from './dto/login.dto';
+
 import { AuthService } from './auth.service';
+
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { AuthRateLimitGuard } from './guards/auth-rate-limit.guard';
 import type { AuthenticatedRequest } from './interfaces/authenticated-request.interface';
+
 import { ApiBearerAuth } from '@nestjs/swagger';
 // Cache constant
 const CACHE_CONTROL_HEADER = 'Cache-Control';
@@ -68,6 +72,7 @@ export class AuthController {
     return this.authService.login(dto);
   }
 
+  @Post('logout')
   @Post('logout')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
