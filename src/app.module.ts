@@ -4,8 +4,34 @@ import { AppService } from './app.service';
 import { HelloModule } from './hello/hello.module';
 import { I18nModule } from 'nestjs-i18n';
 import { join } from 'path';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { ThrottlerModule } from '@nestjs/throttler';
+
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get<string>('DB_HOST'),
+        port: Number(configService.get<string>('DB_PORT')),
+        username: configService.get<string>('DB_USERNAME'),
+        password: configService.get<string>('DB_PASSWORD'),
+        database: configService.get<string>('DB_DATABASE'),
+        autoLoadEntities: true,
+        synchronize: false,
+      }),
+    }),
+
     I18nModule.forRoot({
       fallbackLanguage: 'en',
       loaderOptions: {
@@ -13,8 +39,28 @@ import { join } from 'path';
         watch: true,
       },
     }),
+
+    ThrottlerModule.forRoot([
+      {
+        name: 'short',
+        ttl: 60 * 1000,
+        limit: 5,
+      },
+      {
+        name: 'auth',
+        ttl: 60 * 1000,
+        limit: 3,
+      },
+    ]),
+
     HelloModule,
+    UsersModule,
+    AuthModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+    }),
   ],
+
   controllers: [AppController],
   providers: [AppService],
 })

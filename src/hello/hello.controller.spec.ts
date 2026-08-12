@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { HelloController } from './hello.controller';
+import { HelloService } from './hello.service';
 
 describe('HelloController', () => {
   let controller: HelloController;
@@ -7,6 +8,14 @@ describe('HelloController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [HelloController],
+      providers: [
+        {
+          provide: HelloService,
+          useValue: {
+            getHello: jest.fn().mockReturnValue({ message: 'Hello World!' }),
+          },
+        },
+      ],
     }).compile();
 
     controller = module.get<HelloController>(HelloController);
