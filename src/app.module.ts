@@ -19,6 +19,7 @@ import { CommentsModule } from './comments/comments.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: [`.env.${process.env.NODE_ENV}`, '.env'],
     }),
 
     TypeOrmModule.forRootAsync({
