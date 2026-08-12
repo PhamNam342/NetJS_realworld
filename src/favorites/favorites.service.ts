@@ -40,4 +40,39 @@ export class FavoritesService {
       articleId,
     });
   }
+  async findFavoritedArticleIds(
+    userId: string,
+    articleIds: string[],
+  ): Promise<string[]> {
+    if (articleIds.length === 0) {
+      return [];
+    }
+
+    const favorites = await this.favoriteRepository.find({
+      where: articleIds.map((articleId) => ({
+        userId,
+        articleId,
+      })),
+    });
+
+    return favorites.map((favorite) => favorite.articleId);
+  }
+
+  async countFavoritesByArticleIds(
+    articleIds: string[],
+  ): Promise<Map<string, number>> {
+    if (articleIds.length === 0) {
+      return new Map();
+    }
+
+    const rows = await this.favoriteRepository
+      .createQueryBuilder('favorite')
+      .select('favorite.articleId', 'articleId')
+      .addSelect('COUNT(*)', 'count')
+      .where('favorite.articleId IN (:...articleIds)', { articleIds })
+      .groupBy('favorite.articleId')
+      .getRawMany<{ articleId: string; count: string }>();
+
+    return new Map(rows.map((row) => [row.articleId, Number(row.count)]));
+  }
 }

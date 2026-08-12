@@ -74,28 +74,30 @@ export class ArticlesService {
     authUser?: AuthenticatedUser,
   ): Promise<ArticlesResponseDto> {
     const limit = Math.min(Number(query.limit ?? 20), 100);
-
     const offset = Math.max(Number(query.offset ?? 0), 0);
+
     const qb = this.articleRepository
       .createQueryBuilder('article')
       .leftJoinAndSelect('article.author', 'author');
 
-    // filter tag
+    // Filter by tag
     if (query.tag) {
       qb.andWhere(':tag = ANY(article.tagList)', {
         tag: query.tag,
       });
     }
 
-    // filter author
+    // Filter by author
     if (query.author) {
       qb.andWhere('author.username = :author', {
         author: query.author,
       });
     }
-    // filter có theo bài có người thích
+
+    // Filter by favorited username
     if (query.favorited) {
       qb.innerJoin(Favorite, 'favorite', 'favorite.article_id = article.id');
+
       qb.innerJoin(
         User,
         'favoritedUser',
@@ -110,30 +112,31 @@ export class ArticlesService {
     qb.orderBy('article.createdAt', 'DESC');
     qb.take(limit);
     qb.skip(offset);
+
     const [articles, count] = await qb.getManyAndCount();
-    const articleResponses = await Promise.all(
-      articles.map((article) => this.mapArticleToResponse(article, authUser)),
+
+    const articleResponses = await this.mapArticlesToResponse(
+      articles,
+      authUser,
     );
 
     return new ArticlesResponseDto({
       articles: articleResponses,
-
       articlesCount: count,
     });
   }
   async getFeed(
     authUser: AuthenticatedUser,
-
     query: ArticleQueryDto,
   ): Promise<ArticlesResponseDto> {
     const limit = Math.min(Number(query.limit ?? 20), 100);
     const offset = Math.max(Number(query.offset ?? 0), 0);
+
     const followingIds = await this.followsService.getFollowingIds(authUser.id);
 
     if (followingIds.length === 0) {
       return new ArticlesResponseDto({
         articles: [],
-
         articlesCount: 0,
       });
     }
@@ -149,14 +152,16 @@ export class ArticlesService {
     qb.orderBy('article.createdAt', 'DESC');
     qb.take(limit);
     qb.skip(offset);
+
     const [articles, count] = await qb.getManyAndCount();
-    const articleResponses = await Promise.all(
-      articles.map((article) => this.mapArticleToResponse(article, authUser)),
+
+    const articleResponses = await this.mapArticlesToResponse(
+      articles,
+      authUser,
     );
 
     return new ArticlesResponseDto({
       articles: articleResponses,
-
       articlesCount: count,
     });
   }
@@ -302,7 +307,6 @@ export class ArticlesService {
     return this.mapArticleToResponse(article, authUser);
   }
   // RESPONSE MAPPER
-
   private async mapArticleToResponse(
     article: Article,
     authUser?: AuthenticatedUser,
@@ -345,5 +349,60 @@ export class ArticlesService {
         following: isfollowing,
       }),
     });
+  }
+  //Response mapper cho nhiều article
+  private async mapArticlesToResponse(
+    articles: Article[],
+    authUser?: AuthenticatedUser,
+  ): Promise<ArticleResponseDto[]> {
+    if (articles.length === 0) {
+      return [];
+    }
+
+    const articleIds = articles.map((article) => article.id);
+
+    const authorIds = [
+      ...new Set(articles.map((article) => article.author.id)),
+    ];
+
+    const [favoritesCountMap, favoritedArticleIds, followingUserIds] =
+      await Promise.all([
+        this.favoritesService.countFavoritesByArticleIds(articleIds),
+
+        authUser
+          ? this.favoritesService.findFavoritedArticleIds(
+              authUser.id,
+              articleIds,
+            )
+          : Promise.resolve([]),
+
+        authUser
+          ? this.followsService.getFollowingIdsByUserIds(authUser.id, authorIds)
+          : Promise.resolve([]),
+      ]);
+
+    const favoritedIds = new Set(favoritedArticleIds);
+    const followingIds = new Set(followingUserIds);
+
+    return articles.map(
+      (article) =>
+        new ArticleResponseDto({
+          slug: article.slug,
+          title: article.title,
+          description: article.description,
+          body: article.body,
+          tagList: article.tagList ?? [],
+          createdAt: article.createdAt,
+          updatedAt: article.updatedAt,
+          favorited: favoritedIds.has(article.id),
+          favoritesCount: favoritesCountMap.get(article.id) ?? 0,
+          author: new ProfileResponseDto({
+            username: article.author.username,
+            bio: article.author.bio,
+            image: article.author.image,
+            following: followingIds.has(article.author.id),
+          }),
+        }),
+    );
   }
 }
