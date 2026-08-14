@@ -6,8 +6,9 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
-
+import { Comment } from '../../comments/entities/comment.entity';
 import { User } from '../../users/entities/user.entity';
 @Entity('articles')
 export class Article {
@@ -45,4 +46,6 @@ export class Article {
     default: [],
   })
   tagList!: string[];
+  @OneToMany(() => Comment, (comment) => comment.article)
+  comments!: Comment[];
 }
