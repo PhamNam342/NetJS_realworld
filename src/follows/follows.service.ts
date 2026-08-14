@@ -115,4 +115,31 @@ export class FollowsService {
 
     return Boolean(follow);
   }
+  //
+  async getFollowingIds(userId: string): Promise<string[]> {
+    const follows = await this.followRepository.find({
+      where: {
+        followerId: userId,
+      },
+    });
+
+    return follows.map((follow) => follow.followingId);
+  }
+  async getFollowingIdsByUserIds(
+    followerId: string,
+    userIds: string[],
+  ): Promise<string[]> {
+    if (userIds.length === 0) {
+      return [];
+    }
+
+    const follows = await this.followRepository.find({
+      where: userIds.map((followingId) => ({
+        followerId,
+        followingId,
+      })),
+    });
+
+    return follows.map((follow) => follow.followingId);
+  }
 }

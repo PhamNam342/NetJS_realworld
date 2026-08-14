@@ -1,0 +1,6 @@
+{
+  "userNotFound": "Không tìm thấy người dùng",
+  "slugAlreadyExists": "Slug bài viết đã tồn tại",
+  "notFound": "Không tìm thấy bài viết",
+  "notAuthor": "Bạn không phải tác giả"
+}

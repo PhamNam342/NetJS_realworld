@@ -5,7 +5,8 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-
+import { OneToMany } from 'typeorm';
+import { Article } from '../../articles/entities/article.entity';
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
@@ -47,4 +48,6 @@ export class User {
     name: 'updated_at',
   })
   updatedAt!: Date;
+  @OneToMany(() => Article, (article) => article.author)
+  articles!: Article[];
 }
